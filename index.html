@@ -251,7 +251,6 @@ var currentYear='1950'
 if (currentYear==null || currentYear==undefined) {
   currentYear='1950'
 } 
-console.log ('current year is', currentYear)
 
 
 for (let i = 1950; i < 2022; i++) {
@@ -275,23 +274,14 @@ var martiniDone=false;
  async function dataRequestandInit(year)
  {
   console.log('data init running, waiting for data HTTP request')
-    // if (firstLoad==true){
-    //   console.log('query running')
-      
-    //   console.log('query done')
-    // }
-    // console.log('query running')
-    // var dataasyncWait= firstLoad==true?data= await dataQuery().then((tempData)=>{ 
-    //   dataPerYear=d3.group(data,d=>d.Year);}): dataPerYear=d3.group(data,d=>d.Year);
     data=await d3.csv('./joined_world_population_data.csv')
     dataPerYear=d3.group(data,d=>d.Year)
     console.log('query done')
 
     // dataPerYear=d3.group(data,d=>d.Year);
     console.log('data init running, waiting for data HTTP request')
-    console.log (data);
-    console.log (dataPerYear);
-        //scales
+
+//scales
 
     //circle scale to indicate relative size of population
     circleRadiusScale = d3.scaleSqrt()
@@ -302,10 +292,9 @@ var martiniDone=false;
  color = d3.scaleOrdinal()
     .domain([...Array(7).keys()])
     .range(d3.schemeCategory10)
-    
-    console.log ('overall year is: ', yearsAll)
 
-    // Rerserve the SVG space
+
+    // Reserve the SVG space
 
 //color scale for density:
 // rgb(255, 255, 255)
@@ -315,18 +304,8 @@ var martiniDone=false;
 // rgb(203, 67, 53)
 
 //main body
-console.log('entering yearsAll loop')
-console.log (currentYear)
 await mainRendering(year);
 firstLoad=false;
-// yearList.map( (eachYear)=>{
-//     setTimeout(async () => {
-//         await mainRendering(eachYear);
-//         console.log('await for mainRendering for the year finished', eachYear)
-//   console.log("Delaying for 10 mili second.");
-// }, 10)
-// }
-// )
 }
 
 //init
@@ -385,8 +364,6 @@ console.log("first load is:",firstLoad)
     if (firstLoad==true){
     //required init
     //create svg component
-
-    console.log ('entering non 1950 loop')
     svg = d3.select("#D3MainContent")
       .append("svg")
       .attr("class", "svgD3MainContent") 
@@ -410,16 +387,12 @@ console.log("first load is:",firstLoad)
 //axis setup
 // var xAxisDomain = [0, d3.max(data,function(d) { return +d['Crude Birth Rate (births per 1,000 population)']; })];
 xAxisDomain = [0, axisSyncDomain];
-console.log(xAxisDomain);
 var xAxisRange=[0,width];
-console.log(xAxisRange);
 
 
 // var yAxisDomain=[0, d3.max(data,function(d) { return +d['Crude Death Rate (deaths per 1,000 population)']; })];
  yAxisDomain=[0, axisSyncDomain];
-console.log (yAxisDomain);
  yAxisRange=[height,0];
-console.log (yAxisRange);
 
 
 //create axis
@@ -452,72 +425,12 @@ svg.append("text")
     .text('Crude Birth Rate (births per 1,000 population)')
 
 
-// Create timeline slider
-
 // Time scale
 slideTimeScale=d3.scaleLinear().domain([1950,2021]).range([0,timeSliderWidth-100]);//give margin for the actual svg
 
 
-
-
-// const timelineSliderTrack = timelineSliderGroup.append('rect')
-//   .attr('width', 1000)
-//   .attr('height', 10)
-//   .attr('rx', 5)
-//   .attr('fill', '#ccc')
-// .attr("transform", `translate(${0}, ${0})`)
-// .attr('class', 'timelineSlider');
-
-// const timelineSliderMarker = timelineSliderGroup.append('rect')
-//   .attr('width', 3)
-//   .attr('rx', 2)
-//   .attr('height', 60)
-//   .attr('fill', 'red')
-// .attr("transform", `translate(${0}, ${-1.5})`)
-// .attr('class', 'timelineSlider')
-// .attr("x", (d, i) => {return slideTimeScale(d) }) // -15 to offset the rectangle to center it; +30 to offset rectangle width
-// .raise();
-
-// const timelineSliderText = timelineSliderGroup.selectAll('text').data(yearList)
-//   .enter()
-//   .append("text")
-//   .attr("x", (d, i) => {return slideTimeScale(d) }) // -15 to offset the rectangle to center it; +30 to offset rectangle width
-//   .attr("y", 5+20+10) //10 offset from bar x,y origin point 
-//   .text(d=>d)
-//   .raise();
-
-// const timelineSliderHandle = timelineSliderGroup.append('circle')
-// .attr("transform", `translate(${0}, ${70})`)
-//   .attr('r', 30)
-//   .attr('fill', '#333')
-//   .attr('class', 'timelineSliderHandle')
-//   .raise();
-
-
-
-//   xAxis=d3.scaleLinear().domain(xAxisDomain).range(xAxisRange);
-// svg.append("g")
-//     .attr("class", "xAxis") 
-//     .attr("transform", `translate(0, ${height})`)
-//     .call(d3.axisBottom(xAxis));
-
-
-
-
-// //color scale to separate by regions
-// const color = d3.scaleOrdinal()
-//     .domain([...Array(7).keys()])
-//     .range(d3.schemeCategory10)
-
-//circle scale to indicate relative size of population
-// const circleRadiusScale = d3.scaleSqrt()
-//     .domain([0,d3.max(data,function(d) { return d['Total Population, as of 1 July (thousands)']; })])
-//     .range([0,4])
-
 //create the legend for circles
-// var circleLegendValues=[0,d3.max(data,function(d) { return d['Total Population, as of 1 July (thousands)'];})]
 var circleLegendValues=[0,500000,1000000,1425862]
-console.log ('generating legend for circles size')
 
 svgLegend = d3.select("#D3MainContent")
 .append("svg")
@@ -526,10 +439,7 @@ svgLegend = d3.select("#D3MainContent")
         .attr("height", height + marginTop + marginBottom)
       .append("g")
         .attr("transform", `translate(0,0)`)
-        // .attr("transform", `translate(${legendWidth/2}, ${(height+ marginTop + marginBottom)/2})`)
 
-
-console.log('circleLegendValues',circleLegendValues)
 var circleLegend = svgLegend.append("g")
     .attr("class", "circleLegend")
     .selectAll('circle')
@@ -572,18 +482,6 @@ var circleLegendText=svgLegend.append("g")
     .text('Size of Population')
     .attr("transform", `translate(${legendWidth/2},0)`); // Display the data value
 
-// svg.append('g')
-//     .selectAll("circle")
-//     .data(dataPerYear.get('1950'))
-//     .enter()
-//     .append("circle")
-//     .attr('cx',(d,i)=>{return xAxis(d['Crude Death Rate (deaths per 1,000 population)'])})
-//     .attr('cy',(d,i)=>{return yAxis(d['Crude Birth Rate (births per 1,000 population)'])})
-//     .attr('r',(d,i)=>{return circleRadius(d['Total Population, as of 1 July (thousands)'])})
-//     .attr("stroke", "steelblue")
-//       .attr("stroke-width", 1.5)
-//       .attr("fill", (d,i)=>{console.log (d['Region']);return color(d['Region'])})
-
 //Create increasing/declining population reference line
 const referenceLineData = [[0, 0], [axisSyncDomain, axisSyncDomain]]; // Adjust points as needed
 const lineGenerator = d3.line()
@@ -595,11 +493,6 @@ svg.append("path")
   .attr("stroke", "brown") // Adjust color as needed
   .attr("stroke-dasharray", "5,5"); // Optional: dashed line
 
-
-
-
-
-
 // Reserve the SVG space inside SVG legend for density heatmap data legend
 var colorDensityMapLegendBarSvg= svgLegend.append("svg").append('g')
   .attr("class", "densityMapsvg")
@@ -607,8 +500,6 @@ var colorDensityMapLegendBarSvg= svgLegend.append("svg").append('g')
   .attr("height", colorDensityMapLegendHeight)
   .attr("transform", `translate(0,${marginTop+(legendHeight/2)+85})`)
   .raise();
-
-  
 
 //create the actual legend bar
 var colorDensityMapLegendBar= colorDensityMapLegendBarSvg.selectAll("rect")
@@ -648,23 +539,7 @@ var colorDensityMapLegendBar= colorDensityMapLegendBarSvg.selectAll("rect")
   .raise();
 
 
-  //create legend for color coding country
-//   function onlyUnique(value, index, array) {
-//   return array.indexOf(value) === index;
-// }
-// console.log ('data per year is', dataPerYear.get(year)
-// let uniqueCountryTemp=[...dataPerYear.get(year)]
-// Object.keys(uniqueCountryTemp).forEach(function(key, index) {
-//   coutries=uniqueCountryTemp['Region']
-// });
-// console.log (coutries)
-// let uniqueCountry=coutries.filter(onlyUnique)
-// console.log(uniqueCountry)
-
-
-
 // Add one dot in the legend for each name.
-console.log('distict regions are:',regionDistinct)
 var size = 20
 svgLegend.selectAll("legendBoxes")
   .data(regionDistinct)
@@ -687,8 +562,6 @@ svgLegend.selectAll("labelsBox")
     .text(function(d,i){ return d})
     .attr("text-anchor", "left").attr("transform", `translate(${-110}, ${30})`)
     
-
-
 //END OF STATICS COMPONENT, DO NOT DELETE THE CURLY  
     }
 
@@ -717,7 +590,7 @@ svg.append('g')
     .attr('r',(d,i)=>{return circleRadiusScale(d['Total Population, as of 1 July (thousands)'])})
     .attr("stroke", "steelblue")
       .attr("stroke-width", 1.5)
-      .attr("fill", (d,i)=>{console.log (d['Region']);return color(d['Region'])})
+      .attr("fill", (d,i)=>{return color(d['Region'])})
 
 //Create label for the data points
       svg.append("g")
@@ -734,56 +607,26 @@ svg.append('g')
       .each(function(d, i, nodes) {
     const label = this;
     const otherLabels = nodes.slice(0, i);
-    // const circle = svg.selectAll('circle').filter(circleData => {console.log (circleData,d,circleData === d); return circleData === d}); 
-    // console.log (svg.selectAll('circle').each((child)=>{console.log(child,d,child===d)}))
-    // console.log (svg.selectAll('circle'))
-    // console.log (circle)
-    // console.log(d)
-    // console.log (d['Region, subregion, country or area *'])
-    // console.log (circle.size())
-    // console.log (circle.nodes())
-    // console.log (d)
+
     const circleNodes = svg.selectAll('circle').nodes()
-    // console.log (circleNodes)
 
-
-    // if (circle.size() === 1) { // Check if circle exists
-    //   var circleBBox = circle.node().getBBox();
-    //   console.log (circleBBox)
-    //   // ... your code for checking overlap and adjusting positions
-    // } 
-    // else {
-    //   console.error("Circle not found for label:", d);
-    // }
     let adjusted = false;
 
     // Adjust label position if overlapping
     otherLabels.forEach(otherLabel => {
       if (isOverlapping(label, otherLabel)) {
-        // Adjust label position here (e.g., move it down or to the side)
-        // console.log ('is overlapping between label and otherLabel', label, otherLabel)
-        label.setAttribute('y', label.getAttribute('y') - 5); // Simple adjustment, you can refine this
+        label.setAttribute('y', label.getAttribute('y') - 5); 
         adjusted = true;
       }
     });
 
     circleNodes.forEach(circleNode => {
       if (isOverlapping(label, circleNode)) {
-        // Adjust label position here (e.g., move it down or to the side)
-        // console.log ('is overlapping between label and otherLabel', label, circleNode)
-        label.setAttribute('y', label.getAttribute('y') - 5); // Simple adjustment, you can refine this
+        label.setAttribute('y', label.getAttribute('y') - 5); 
         adjusted = true;
       }
     });
 
-    // circleNode.forEach(circleNodeChild => {
-    //   if (isOverlapping(label, circleNodeChild)) {
-    //     // Adjust label position here (e.g., move it down or to the side)
-    //     console.log ('is overlapping between circleNode and label', label,circle,circleNode)
-    //     label.setAttribute('y', label.getAttribute('y') - 5); // Simple adjustment, you can refine this
-    //     adjusted = true;
-    //   }
-    // });
 
     // If label was adjusted, check for new overlaps and adjust again if needed
     if (adjusted) {
@@ -828,8 +671,6 @@ function isOverlapping(element1, element2) {
     .bandwidth(7)
     (dataPerYear.get(year))
 
-    console.log ('density data is: ',densityData)
-
   // show the shape of density map
   svg.insert("g", "g")
   .attr("class", "dynamicComponent")
@@ -837,102 +678,25 @@ function isOverlapping(element1, element2) {
     .data(densityData)
     .enter().append("path")
       .attr("d",d3.geoPath())
-      .attr("fill", function(d) { console.log (d.value,colorDensityMap(d.value),d3.geoPath()); return colorDensityMap(d.value); }).attr('opacity', "0.2")
-
-
-
-// var densestContour = densityData.reduce((a, b) => a.value > b.value ? a : b);
-// var densestContour= densityData.reduce((acc, curr) => acc + curr.value, 0) / densityData.length;
-// console.log(densestContour.coordinates[0])
-// console.log(densityData)
-// console.log(densestContour)
-// console.log([...densestContour.coordinates[0][0]])
-
-// const referenceLineData = [[0, 0], [axisSyncDomain, axisSyncDomain]]; // Adjust points as needed
-// const lineGenerator2 = d3.line()
-//   .x(d => d[0])
-//   .y(d => d[1]);
-
-// svg.append("path")
-// .attr("class", "tryerLine")
-//   .attr("d", lineGenerator2([...densestContour.coordinates[0][0]]))
-//   .attr("stroke", "red") // Adjust color as needed
-//   .attr("stroke-dasharray", "5,5"); // Optional: dashed line
-
-
-// // Calculate the centroid of the densest contour
-// // const centroid = d3.polygonCentroid(densestContour.coordinates[0][0]);
-// const centroid = d3.polygonCentroid([...densestContour.coordinates[0][0]]);
-// console.log(centroid)
-// // Convert centroid coordinates to pixel coordinates
-// const x = xAxis(centroid[0]);
-// const y = yAxis(centroid[1]);
-
-// console.log("Densest location coordinates:",x,y, centroid[0], centroid[1]);
-
-
-// // Define annotation for densest location
-// var annotations = [{
-//   note: {
-//     label: "Densest Location",
-//     title: 'Densest number of country'
-//   },
-//   x: centroid[0], // Use calculated x directly
-//   y: centroid[1], // Use calculated y directly
-//   dy: 100,
-//   dx: 250,
-//   className: "show-bg",
-//   subject: { radius: 50, radiusPadding: -50 },
-//   color: ['red'],
-//   connector:{end: "arrow"}
-// }]
-
-
-// const makeAnnotations = d3.annotation()
-//   .editMode(true)
-//   .notePadding(15)
-//   .type(type)
-//   .annotations(annotations)
-
-// // makeAnnotations.annotations([
-// //     {
-// //       ...densestAnnotation,
-// //       x: d => x,
-// //       y: d => y,
-// //     }
-// //   ]);
-
-// svg.append("g")
-//   .attr("class", "annotation-group")
-//   .call(makeAnnotations.annotations(annotations));
-
+      .attr("fill", function(d) { return colorDensityMap(d.value); }).attr('opacity', "0.2")
 
 // Top 3 density countour annotation
 // Sort the densityData by value in descending order
 var sortedDensityData = densityData.sort((a, b) => b.value - a.value);
 // Get the top 3 densest contours
-// var top3DensestContours = sortedDensityData.slice(0, 3);
-console.log (sortedDensityData)
 var top3DensestContours = [];
  top3DensestContours= [sortedDensityData[0],sortedDensityData[parseInt((sortedDensityData.length)/2)],sortedDensityData[sortedDensityData.length-1]];
-console.log (top3DensestContours)
 var top3Centroid = [];
 
 for (const contour of top3DensestContours) {
-    console.log ('computing top3Centroid for: ', year, contour)
-    console.log ('computing top3Centroid for: ', year, contour['coordinates'])
     let countourGroup=[...contour.coordinates[0]];
-    console.log (countourGroup)
     let tempCoordinates=[];
     tempCoordinates=await d3.polygonCentroid(...countourGroup);
-    console.log (tempCoordinates)
     top3Centroid.push(tempCoordinates);
     }
-    console.log(top3Centroid)
-console.log(top3DensestContours)
-console.log (top3Centroid)
+
 await globalTop3Centroid.push(top3Centroid)
-console.log(globalTop3Centroid)
+
 
 var referenceny=50
 var referencenx=50
@@ -996,20 +760,15 @@ const makeAnnotations = d3.annotation()
 
   //Inspired and adapted from https://stackoverflow.com/questions/70415772/d3-js-animate-a-circle-along-x-y-coordinates
   // add path
-
-  console.log ('globalTop3Centroid before annotation for loop is: ',globalTop3Centroid)
 for (const iter of globalTop3Centroid){
-    console.log (iter)
 
     if (!globalMedian3Centroid.includes(iter[1]))
     {
         globalMedian3Centroid.push(iter[1]);
-        console.log (globalMedian3Centroid)
     }
     
 }
-console.log ('globalTop3Centroid is: ', globalTop3Centroid)
-console.log ('globalMedian3Centroid is: ', globalMedian3Centroid)
+
 
 //animation for annotation
 const annotationGroup = d3.selectAll('.annotation-group');
@@ -1034,11 +793,6 @@ const animationPathGenerator = d3.line()
           .attr('fill', 'none').attr("id","animationPath")
 
       // draw circle at initial location
-
-    console.log (localAnnotationVariables)
-    console.log(annotationTracePath.node())
-
-
       // animation for circle
       globalCircle.raise().transition()
           .ease(d3.easePolyOut.exponent(4))
@@ -1087,10 +841,9 @@ timelineSlidertext = timelineSliderGroup.selectAll().data(yearMartini).enter().a
 //Create the circle handle for timeline bar
 let tempArr=[];
 tempArr.push(parseInt(currentYear))
-console.log('this is tempArr: ', tempArr);
 timelineSliderGroup.selectAll('circle').remove()
 timelineSliderGroup.selectAll().data(tempArr).enter().append('circle')
-.attr('cx',(d,i)=>{console.log('purple ball got executed, data is: ',d,i, slideTimeScale(d)); return slideTimeScale(d)})
+.attr('cx',(d,i)=>{return slideTimeScale(d)})
 .attr("transform", `translate(${0}, ${-8})`)
   .attr('r', 10)
   .attr('fill', 'purple')
@@ -1102,22 +855,9 @@ console.log ('end of mainRendering function')
 }
 
 
-
-// timelineSliderSVG.append('g').selectAll('g').append('g').attr("class", "dynamicComponent").attr("transform", `translate(${50}, ${25})`).data(tempArr).enter().append('g').append('circle')
-// .attr('x',(d,i)=>{return slideTimeScale(parseInt(d))})
-// .attr("transform", `translate(${0}, ${-8})`)
-//   .attr('r', 10)
-//   .attr('fill', 'purple')
-//   .attr("style", "dominant-baseline: hanging; text-anchor: middle;  font-weight: 900;") // Text alignment and styling
-//   .raise();
-
 function recreatePurpleHandler (currentYear){
   let tempArr=[];
   tempArr.push(parseInt(currentYear))
-  console.log('current year is:', currentYear)
-  console.log('current year is:', tempArr)
-  console.log (timelineSliderSVG)
-
 }
 
 
@@ -1129,66 +869,19 @@ var pageArrayIndexing=['content0', 'content1','content2','content3']
 
 document.addEventListener("DOMContentLoaded", async function() {
   recreatePurpleHandler(currentYear);
-//     function nextButtonAction(currentPageIndex){
-//         //take index to pageArrayIndexing
-//         console.log ('JS listened to eventlistener for nextButtonAction')
-//         if ((currentPageIndex<=pageArrayIndexing.length-1) && (currentPageIndex>=0)){
-//         const elementToHide = document.getElementById(pageArrayIndexing[currentPageIndex]);
-//         const elementToShow= document.getElementById(pageArrayIndexing[currentPageIndex+1]);
-//         dataRequestandInit(yearMartini[currentPageIndex+1])
-//         elementToHide.style.display="none";
-//         elementToShow.style.display='inline';
-//         currentPageIndex=currentPageIndex+1;
-//         }
-//     }
-    
-// function previousButtonAction(currentPageIndex){
-//         //take index to pageArrayIndexing
-//         console.log ('JS listened to eventlistener for previous ButtonAction')
-//         if ((currentPageIndex<=pageArrayIndexing.length-1) && (currentPageIndex>=0)){
-//         const elementToHide = document.getElementById(pageArrayIndexing[currentPageIndex]);
-//         const elementToShow= document.getElementById(pageArrayIndexing[currentPageIndex-1]);
-//         currentPageIndex=currentPageIndex-1;
-//         dataRequestandInit(yearMartini[currentPageIndex-1]);
-//         elementToHide.style.display="none";
-//         elementToShow.style.display='inline';
-//         currentPageIndex=currentPageIndex+1;
-//         }
-
-
-//     }
-
-// var nextButtonEventListerner = document.querySelector(".nextButton");
-// var backButtonEventListerner = document.querySelector(".backButton");
-
-
-// nextButtonEventListerner.addEventListener("onclick", nextButtonAction(currentPageIndex));
-// backButtonEventListerner.addEventListener("onclick", previousButtonAction(currentPageIndex));
-  // Add event listener to the submit button
   window.onload= document.getElementById('submitBtn');
   submitBtn.addEventListener('click', () => {
-    // d3.selectAll('path').remove();
     console.log('button click detected, value is: ',yearSelect.value)
     const selectedYear = yearSelect.value;
     currentYear=String(selectedYear);
 mainRendering(currentYear)
-    console.log('Selected year:', selectedYear);
-    // Do something with the selected year here
   });
 
 
 window.onload= document.getElementById("nextButton").addEventListener("click", async ()=>{
   var dropdownComponent=[];
   
-
-  //  document.getElementByClassName("content3").map((classValue)=>{dropdownComponent.append(classValue)})
-
-  //     if (currentPageIndex==pageArrayIndexing.length-1){
-  //       // dropdownComponent.map((eachComponent)=>{eachComponent.style='block';})
-  //       dropdownComponent.style='block'
-  //     }
 if (martiniDone==false){
-    console.log ('JS listened to eventlistener for nextButtonAction')
     console.log (currentYear,currentPageIndex)
         if ((currentPageIndex<=pageArrayIndexing.length-1) && (currentPageIndex>=0)){
         const elementToHide = document.getElementById(pageArrayIndexing[currentPageIndex]);
@@ -1211,23 +904,6 @@ if (martiniDone==false){
         console.log ('current year and counter is')
         console.log (currentYear,currentPageIndex,pageArrayIndexing)
         }
-      //     currentYear=String(yearMartini[currentPageIndex+1])
-      //  const placeholder= await dataRequestandInit(yearMartini[currentPageIndex+1]).then(()=>       
-      //  {
-      //   document.getElementById('yearDropDown').style.display='block';
-      //    elementToHide.style.display="none"
-      //    elementToShow.style.display='inline';
-      //   document.getElementById('nextButton').style.display='none';
-      //   document.getElementById('year').style.display='inline';
-
-
-      //  currentPageIndex=parseInt(currentPageIndex)+1;
-      //  martiniDone=true;
-       
-      //   console.log ('current year and counter is')
-      //   console.log (currentYear,currentPageIndex,pageArrayIndexing)
-      //   }
-      //   )
         else {
           document.getElementById('content4').style.display='none';
           document.getElementById('year').style.display='none';
@@ -1248,46 +924,6 @@ if (martiniDone==false){
 }
 })
 
-
-// document.getElementById("backButton").addEventListener("click", async ()=>{
-//     console.log ('JS listened to eventlistener for previous ButtonAction')
-//         if ((currentPageIndex<=pageArrayIndexing.length-1) && (currentPageIndex>=0)){
-//         const elementToHide = document.getElementById(pageArrayIndexing[currentPageIndex]);
-//         const elementToShow= document.getElementById(pageArrayIndexing[currentPageIndex-1]);
-//         currentPageIndex=currentPageIndex-1;
-//         currentYear=String(yearMartini[currentPageIndex-1]);
-//         const placeholder= await dataRequestandInit(yearMartini[currentPageIndex-1]).then(()=> 
-//         {elementToHide.style.display="none";
-//         elementToShow.style.display='inline';
-//         currentPageIndex=currentPageIndex+1;
-//         console.log (currentYear,currentPageIndex)
-//     })
-// }
-// })
-// const yearDropDown = document.getElementById('year').value;
-        
-
-// const submitBtn = document.getElementById('submitBtn').addEventListener('click', () => {
-//             currentYear = yearDropdown.value;
-//             console.log('Selected year:', selectedYear);
-//             mainRendering(String(currentYear))
-//         });
-
-
-
-// function populateYears(startYear, endYear) {
-//   for (let year = endYear; year >= startYear; year--) {
-//     const option = document.createElement('option');
-//     option.value = year;
-//     option.text = year;
-//     yearDropdown.appendChild(option);
-//   }
-//   console.log('populate year Running')
-// }
-
-
-// // Call the function to populate the dropdown
-// populateYears(1950, 2021);
 })
 
 </script>
@@ -1302,9 +938,8 @@ if (martiniDone==false){
 
     <div id="D3container" class="container">
     <div id="D3Narrative" class="narrative box">
+      <button onClick="window.location.reload();">Refresh Page</button>
         <div>
-        <!-- <button id='backButton' type="button">Previous Generation</button> -->
-
     </div>
     </div>
     <div id="D3MainContent" class="fixed" >
@@ -1316,11 +951,6 @@ if (martiniDone==false){
           <label for="year" class="offset">Choose a year:</label>
           <select name="year" id="year" class="offset" value=year>
               <script>
-                  // for (let year = 2021; year >= 1950; year--) {
-                  //     document.write('<option value="' + year + '">' + year + '</option>');
-                  // }
-
-                  // Populate the select options
   const yearSelect = document.getElementById('year');
   for (let year = 2021; year >= 1950; year--) {
     const option = document.createElement('option');
@@ -1331,7 +961,7 @@ if (martiniDone==false){
               </script>
           </select>
           <br><br>
-          <button type="button"id='submitBtn' class="offset" click="" style="height:20px;">Select a year</button>
+          <button type="button"id='submitBtn' class="offset" click="" style="height:20px; background-color:yellow;">Select a year</button>
       </form>
     </span>
     </div>
@@ -1369,7 +999,7 @@ if (martiniDone==false){
             </span>
 
             <span id="content2" class='content'>
-                <h2><b><u>Midpoint to today: 1980</u></b></h>
+                <h2><b><u>Midpoint to today: 1981</u></b></h>
                     <h3>Millenials</h3>
                     <h4>Movement trending to third quadrant</h4>
                 <p> It is becoming more apparant by the annotation trace that the higher density area had shifted towards the second quadrant, the lower left side of the map</p>
