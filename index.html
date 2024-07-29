@@ -236,8 +236,8 @@ var timelineSliderAxis;
 
 var firstLoad=true;
 var timelineSliderGroup;
-
-var currentYear = String(getElementById('year').value);
+var currentYear='1950'
+// var currentYear = String(getElementById('year').value);
 if (currentYear==null || currentYear==undefined) {
   currentYear='1950'
 } 
@@ -1111,14 +1111,15 @@ document.getElementById("nextButton").addEventListener("click", async ()=>{
 //     })
 // }
 // })
-// currentYear = document.getElementById('year').value;
-//         const submitBtn = document.getElementById('submitBtn');
+const yearDropDown = document.getElementById('year').value;
+        const submitBtn = document.getElementById('submitBtn');
 
-//         submitBtn.addEventListener('click', () => {
-//             const selectedYear = yearDropdown.value;
-//             console.log('Selected year:', selectedYear);
-//             // You can do something with the selected year here
-//         });
+        submitBtn.addEventListener('click', () => {
+            currentYear = yearDropdown.value;
+            console.log('Selected year:', selectedYear);
+            dataRequestandInit(String(currentYear))
+            // You can do something with the selected year here
+        });
 
 
 
@@ -1155,7 +1156,7 @@ populateYears(1950, 2021);
     </div>
     <div id="D3MainContent" class="fixed" ></div>
     <div id="D3Misc" class="rightGutter box">
-      <form>
+      <form class="content3">
         <label for="year">Choose a year:</label>
         <select name="year" id="year">
             <script>
