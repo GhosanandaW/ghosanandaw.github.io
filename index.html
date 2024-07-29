@@ -700,10 +700,35 @@ await globalTop3Centroid.push(top3Centroid)
 
 var referenceny=50
 var referencenx=50
+var labelMax="HIGHEST density number of country"
+var labelMedian='MEDIAN density of number of country'
+var labelMin='LOWEST density of number of country'
+
+
+if (parseInt(year)==1950){
+  labelMedian='CONVERGENCE of Median and highest: high birth and high death'
+}
+else if (parseInt(year)==1965){
+  labelMedian='MEDIAN density of number of country'
+  labelMax='STAGNATION: highest density is in low birth and low death'
+}
+else if (parseInt(year)==1981){
+  labelMax="HIGHEST density number of country"
+  labelMedian='MEDIAN DENSITY TRENDS TO STAGNATION'
+}
+else if (parseInt(year)==2021){
+  labelMedian='START OF DECLINE: start of low birth rate and low death rate'
+}
+else {
+labelMax="HIGHEST density number of country"
+labelMedian='MEDIAN density of number of country'
+labelMin='LOWEST density of number of country'
+}
+
 
 var annotations = [{
   note: {
-    label: "HIGHEST density number of country",
+    label: labelMax,
     title: year
   },
   x: top3Centroid[0][0], // Use calculated x directly
@@ -717,7 +742,7 @@ var annotations = [{
 },
 {
   note: {
-    label: 'MEDIAN density of number of country',
+    label: labelMedian,
     title: year
   },
   x: top3Centroid[1][0], // Use calculated x directly
@@ -731,7 +756,7 @@ var annotations = [{
 },
 {
   note: {
-    label: 'LOWEST density of number of country',
+    label: labelMin,
     title: year
   },
   x: top3Centroid[2][0], // Use calculated x directly
