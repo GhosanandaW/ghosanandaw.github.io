@@ -107,6 +107,17 @@ body {
     border: dashed red;
     }
 
+
+  #yearDropdown{
+    position: relative;
+    left: 0px;
+    margin-left:-30px;
+    top:150px;
+    height:50px;
+    width:100px;
+    border: dashed red;
+  }
+
     .rightGutter{
         width:5%;
         /* background-color:yellow; */
@@ -195,6 +206,11 @@ var yearMartini=['1950','1965','1981','1997','2021']
 
 //  var yearMartini=['1950','1975','2000','2021']
 
+const yearDropdown = document.getElementById('yearDropdown');
+
+// Function to populate the dropdown with years
+
+
 
 //declaration
  var yearsAll=[];
@@ -216,11 +232,16 @@ var globalCircle;
 var densityColorMapdomain=[0,0.003];
 var slideTimeScale;
 var timelineSliderAxis;
-var currentYear='1950';
-var timelineSliderSVG;
 
 
+var firstLoad=true;
+var timelineSliderGroup;
 
+var currentYear = String(getElementById('year').value);
+if (currentYear==null || currentYear==undefined) {
+  currentYear='1950'
+} 
+console.log ('current year is', currentYear)
 
 
 for (let i = 1950; i < 2022; i++) {
@@ -276,6 +297,7 @@ for (let i = 1950; i < 2022; i++) {
 console.log('entering yearsAll loop')
 console.log (currentYear)
 mainRendering(year);
+firstLoad=false;
 // yearList.map( (eachYear)=>{
 //     setTimeout(async () => {
 //         await mainRendering(eachYear);
@@ -321,15 +343,18 @@ var type = d3.annotationCalloutCircle
 //main function and other functions
     async function mainRendering(year)
     {
-        d3.selectAll(".dynamicComponent").remove();
+
+        // const element = document.getElementById("div-02");
     if (year!='1950'){
+    await d3.selectAll(".dynamicComponent").remove();
     console.log('current year is', year);
     firstSceneBool==false;
 }
 
-    if (year=='1950'){
+    if (year=='1950' && firstLoad==true){
     //required init
     //create svg component
+    console.log ('entering non 1950 loop')
     svg = d3.select("#D3MainContent")
       .append("svg")
       .attr("class", "svgD3MainContent") 
@@ -345,10 +370,10 @@ var type = d3.annotationCalloutCircle
           .raise()
 
           timelineSliderSVG = d3.select(".falseFooter")
-      .append("svg").attr("class", "dynamicComponent").attr("class", "timelineSliderSVG")
+      .append("svg")
       .attr('width', timeSliderWidth)
       .attr('height', 300)
-        .attr("transform", `translate(${-200}, ${-100})`)
+        .attr("transform", `translate(${-200}, ${0})`)
 
 
 //axis setup
@@ -962,7 +987,11 @@ const animationPathGenerator = d3.line()
 
 
 
-var timelineSliderGroup=timelineSliderSVG.append('g').attr("class", "timelineSliderSVG").attr("transform", `translate(${50}, ${25})`).attr("class", "dynamicComponent");
+timelineSliderGroup=timelineSliderSVG.append('g').attr("class", "timelineSliderSVG").attr("transform", `translate(${50}, ${25})`)
+
+timelineSliderGroup.append("g")
+.attr("class", "dynamicComponent")
+    .call(d3.axisBottom(slideTimeScale));
 
 const timelineSliderAnnotationLine = timelineSliderGroup.selectAll().data(yearMartini).enter().append('rect').attr("class", "dynamicComponent")
 .attr('x',(d,i)=>{return (slideTimeScale(d)-1.5)})
@@ -975,11 +1004,9 @@ const timelineSliderAnnotationLine = timelineSliderGroup.selectAll().data(yearMa
 .attr("transform", `translate(${0}, ${0})`).lower(); // -15 to offset the rectangle to center it; +30 to offset rectangle width
 
 
-timelineSliderGroup.append("g")
-    .attr("class", "xAxis") 
-    .call(d3.axisBottom(slideTimeScale));
 
-const timelineSlidertext = timelineSliderGroup.selectAll().data(yearMartini).enter().append('text').attr("class", "dynamicComponent")
+
+timelineSlidertext = timelineSliderGroup.selectAll().data(yearMartini).enter().append('text').attr("class", "dynamicComponent")
 .attr('x',(d,i)=>{return slideTimeScale(d)})
 .attr("transform", `translate(${0}, ${60})`)
   .attr('class', 'timelineSliderHandle')
@@ -989,21 +1016,23 @@ const timelineSlidertext = timelineSliderGroup.selectAll().data(yearMartini).ent
   .attr('border', 'dashed red')
   .raise();
 
-
+  recreatePurpleHandler(currentYear);
 //Create the circle handle for timeline bar
-timelineSliderGroup.selectAll().data(yearMartini).enter().append('circle').attr("class", "dynamicComponent")
-.attr('x',(d,i)=>{return slideTimeScale(parseInt(currentYear))})
-.attr("transform", `translate(${0}, ${-8})`)
-  .attr('r', 10)
-  .attr('fill', 'purple')
-  .attr("style", "dominant-baseline: hanging; text-anchor: middle;  font-weight: 900;") // Text alignment and styling
-  .raise();
+
 
 console.log ('end of mainRendering function')
 //end of mainRendering, don't remove curly
 }
 
-
+function recreatePurpleHandler (currentYear){
+  timelineSliderGroup.selectAll().data([currentYear]).enter().append('circle').attr("class", "dynamicComponent")
+.attr('x',(d,i)=>{return slideTimeScale(parseInt(d))})
+.attr("transform", `translate(${0}, ${-8})`)
+  .attr('r', 10)
+  .attr('fill', 'purple')
+  .attr("style", "dominant-baseline: hanging; text-anchor: middle;  font-weight: 900;") // Text alignment and styling
+  .raise();
+}
 
 
 var currentPageIndex=0;
@@ -1060,28 +1089,51 @@ document.getElementById("nextButton").addEventListener("click", async ()=>{
         elementToShow.style.display='inline';
        currentPageIndex=currentPageIndex+1;
         elementToHide.style.display="none"
+        console.log ('current year is')
         console.log (currentYear,currentPageIndex)
         }
         )
 }
 })
 
-document.getElementById("backButton").addEventListener("click", async ()=>{
-    console.log ('JS listened to eventlistener for previous ButtonAction')
-        if ((currentPageIndex<=pageArrayIndexing.length-1) && (currentPageIndex>=0)){
-        const elementToHide = document.getElementById(pageArrayIndexing[currentPageIndex]);
-        const elementToShow= document.getElementById(pageArrayIndexing[currentPageIndex-1]);
-        currentPageIndex=currentPageIndex-1;
-        currentYear=String(yearMartini[currentPageIndex-1]);
-        const placeholder= await dataRequestandInit(yearMartini[currentPageIndex-1]).then(()=> 
-        {elementToHide.style.display="none";
-        elementToShow.style.display='inline';
-        currentPageIndex=currentPageIndex+1;
-        console.log (currentYear,currentPageIndex)
-    })
-}
-})
+// document.getElementById("backButton").addEventListener("click", async ()=>{
+//     console.log ('JS listened to eventlistener for previous ButtonAction')
+//         if ((currentPageIndex<=pageArrayIndexing.length-1) && (currentPageIndex>=0)){
+//         const elementToHide = document.getElementById(pageArrayIndexing[currentPageIndex]);
+//         const elementToShow= document.getElementById(pageArrayIndexing[currentPageIndex-1]);
+//         currentPageIndex=currentPageIndex-1;
+//         currentYear=String(yearMartini[currentPageIndex-1]);
+//         const placeholder= await dataRequestandInit(yearMartini[currentPageIndex-1]).then(()=> 
+//         {elementToHide.style.display="none";
+//         elementToShow.style.display='inline';
+//         currentPageIndex=currentPageIndex+1;
+//         console.log (currentYear,currentPageIndex)
+//     })
+// }
+// })
+// currentYear = document.getElementById('year').value;
+//         const submitBtn = document.getElementById('submitBtn');
 
+//         submitBtn.addEventListener('click', () => {
+//             const selectedYear = yearDropdown.value;
+//             console.log('Selected year:', selectedYear);
+//             // You can do something with the selected year here
+//         });
+
+
+
+function populateYears(startYear, endYear) {
+  for (let year = endYear; year >= startYear; year--) {
+    const option = document.createElement('option');
+    option.value = year;
+    option.text = year;
+    yearDropdown.appendChild(option);
+  }
+  console.log('populate year Running')
+}
+
+// Call the function to populate the dropdown
+populateYears(1950, 2021);
 })
 
 </script>
@@ -1098,10 +1150,23 @@ document.getElementById("backButton").addEventListener("click", async ()=>{
     <div id="D3Narrative" class="narrative box">
         <div>
         <!-- <button id='backButton' type="button">Previous Generation</button> -->
+
     </div>
     </div>
     <div id="D3MainContent" class="fixed" ></div>
     <div id="D3Misc" class="rightGutter box">
+      <form>
+        <label for="year">Choose a year:</label>
+        <select name="year" id="year">
+            <script>
+                for (let year = 2021; year >= 1950; year--) {
+                    document.write('<option value="' + year + '">' + year + '</option>');
+                }
+            </script>
+        </select>
+        <br><br>
+        <input type="submit" value="Submit">
+    </form>
         <button id='nextButton'type="button">Following Generation</button>
     </div>
     <div id="rightNarrative" class="rightNarrative">
@@ -1129,8 +1194,8 @@ document.getElementById("backButton").addEventListener("click", async ()=>{
             <h2><b><u>Midpoint to today: 1965</u></b></h>
                 <h3>Gen X</h3>
                 <h4>Movement trending to second quadrant</h4>
-            
-            <p> In other words, the world is having:</p>
+                <p> It is shown by the annotation trace that the median density is moving towards the second quadrant</p>
+            <p> However, it is not crossing the reference line yet, thus the world is still growing in population. In other words, the world is having:</p>
             <h2><b>Population growth (still)-BUT AT SLOWER SPACE</b></h2>
             </span>
 
@@ -1138,9 +1203,11 @@ document.getElementById("backButton").addEventListener("click", async ()=>{
                 <h2><b><u>Midpoint to today: 1980</u></b></h>
                     <h3>Millenials</h3>
                     <h4>Movement trending to third quadrant</h4>
+                    <p> It is shown by the annotation trace that the median density is moving towards the second quadrant</p>
+            <p> However, it is not crossing the reference line yet, thus the world is still growing in population.</p>
                 
                 <p> In other words, the world is having:</p>
-                <h2><b>Population growth (still)-BUT AT SLOWER SPACE</b></h2>
+                <h2><b>Population growth (still), but more countries are heading towards DECLINING POPULATION</b></h2>
                 </span>
 
 
@@ -1148,9 +1215,10 @@ document.getElementById("backButton").addEventListener("click", async ()=>{
                     <h2><b><u>The world today: 2021~</u></b></h>
                         <h3>Gen Alpha</h3>
                         <h4>Movement trending to fourth quadrant</h4>
-                    
+                        <p> It is shown by the annotation trace that the median density is moving towards the reference line and even more countries crossed the reference line into the third quadrant</p>
+                        <p> This seems to be the trend throughout the world</p>
                     <p> In other words, the world is having:</p>
-                    <h2><b>Population growth (still)-BUT AT SLOWER SPACE</b></h2>
+                    <h2><b>START OF POPULATION DECLINE</b></h2>
                     </span>
 
     </div>
