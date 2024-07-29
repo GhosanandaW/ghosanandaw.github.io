@@ -372,7 +372,7 @@ console.log("first load is:",firstLoad)
       .append("g")
         .attr("transform", `translate(${marginLeft}, ${marginTop})`)
 
-         globalCircle = svg.append('circle')
+         globalCircle = svg.append('circle').attr("id","animationPath")
           .attr('fill', 'maroon')
           .attr('r', 10)
           .attr('style','position: relative; z-index: 99;')
@@ -769,7 +769,8 @@ for (const iter of globalTop3Centroid){
     
 }
 
-
+//stop annimation, after martini complete
+if (martiniDone==false){
 //animation for annotation
 const annotationGroup = d3.selectAll('.annotation-group');
 
@@ -780,8 +781,6 @@ const annotationAnimationObject = d3.transition()
 
 // Select the annotation note and transition and sytle
 const annotationNote = await annotationGroup.transition(annotationAnimationObject).style('opacity', 1);
-
-
 
 const animationPathGenerator = d3.line()
           .x(d => d[0])
@@ -810,6 +809,8 @@ const animationPathGenerator = d3.line()
         }
       }
 
+    }
+//create bottom time slider
 timelineSliderGroup=timelineSliderSVG.append('g').attr("class", "dynamicComponent").attr("transform", `translate(${50}, ${25})`)
 
 timelineSliderGroup.append("g")
@@ -880,7 +881,7 @@ mainRendering(currentYear)
 
 window.onload= document.getElementById("nextButton").addEventListener("click", async ()=>{
   var dropdownComponent=[];
-  
+
 if (martiniDone==false){
     console.log (currentYear,currentPageIndex)
         if ((currentPageIndex<=pageArrayIndexing.length-1) && (currentPageIndex>=0)){
@@ -889,14 +890,13 @@ if (martiniDone==false){
         if (currentPageIndex==pageArrayIndexing.length-1){
           console.log ('end of martini detected',currentPageIndex,pageArrayIndexing.length-1)
 
-
           //last run before pass down
           document.getElementById('yearDropDown').style.display='block';
          elementToHide.style.display="none"
          document.getElementById('content4').style.display='inline';
         document.getElementById('nextButton').style.display='none';
         document.getElementById('year').style.display='inline';
-
+        d3.selectAll('#animationPath').remove();
 
        currentPageIndex=parseInt(currentPageIndex)+1;
        martiniDone=true;
@@ -929,7 +929,7 @@ if (martiniDone==false){
 </script>
 
 <div class="allContent"> 
-  <p style='position:absolute; z-index: 99; margin-top:0;'><b>Ghosananda Wijaya</b></p>
+  <p style='position:absolute; z-index: 99; margin-top:0;'><a href="mailto:gwijaya@connect.ust.hk"><b>Ghosananda Wijaya</b></a></p>
     <div class="title center">
         <h1>World Population, Growth, and Demographic Changes Throughout Time (1950 to 2021)</h1>
     </div>
@@ -962,7 +962,7 @@ if (martiniDone==false){
               </script>
           </select>
           <br><br>
-          <button type="button"id='submitBtn' class="offset" click="" style="height:20px; background-color:yellow;">Select a year</button>
+          <button type="button"id='submitBtn' class="offset" click="" style="height:20px; background-color:yellow; border:dash red">Select a year</button>
       </form>
     </span>
     </div>
@@ -974,7 +974,7 @@ if (martiniDone==false){
             <h3>Baby Boomers Generation</h3>
             <h4>Introduction to the data and visualization</h4>
             <p>The scatterplot visualize and hoped to help everyone on understanding the history, the present, and the future prediction of our world population-where it signifies population growth and decline of nations worldwide!</p>
-            <p>The data was referred to from the UN database and the visualization provides the insights on various countries population size, birth rate, and death rate, by exposing the data with metrics, shown below:</p>
+            <p>The data was referred to from the UN database and the visualization provides the insights on various countries population size, birth rate, and death rate (per 1000 population), by exposing the data with metrics, shown below:</p>
             <ul>
             <li><b>X-Axis:</b> shows the crude population birth rate per 1000 population.</li>
             <li><b>Y-Axis:</b> shows the crude population death rate per 1000 population.</li>
@@ -993,8 +993,9 @@ if (martiniDone==false){
             <h2><b><u>Start of shift: 1965</u></b></h>
                 <h3>Gen X</h3>
                 <h4>Movement started-trending from second to third quadrant</h4>
-                <p> Although not apparant, this signify the start of trend shift, where the world population starts seeing lower death and still high birth</p>
-                <p> The median density started to show movemenet towards the second quadrant, but the world population is still increasing, even with high birth and high death rate</p>
+                <p>Although not apparant, this signify the start of trend shift, where the world population starts seeing lower death but still high birth</p>
+                <p>The median density started to show movement towards the second quadrant, while majority of the countries (highest density in the chart) have shifted toward the third quadrant.</p>
+                <p>But the world population is still increasing, even with high birth and low death rate</p>
             <p>CURRENT STATUS:</p>
             <h2><b>WORLD POPULATION GROWS, BUT START TO SEE SHIFT IN TREND</b></h2>
             </span>
@@ -1003,9 +1004,10 @@ if (martiniDone==false){
                 <h2><b><u>Midpoint to today: 1981</u></b></h>
                     <h3>Millenials</h3>
                     <h4>Movement trending to third quadrant</h4>
-                <p> It is becoming more apparant by the annotation trace that the higher density area had shifted towards the second quadrant, the lower left side of the map</p>
-                    <p> It is shown by the annotation trace that the median density is start moving towards the second quadrant</p>
-            <p> However, it is not significant nor close to crossing the reference line yet, thus the world is still growing in population.</p>
+                <p>It is becoming more apparant by the annotation trace that the higher density area had shifted even towards the second quadrant, the lower left side of the map.</p>
+                <p>It is osberved that more countries started to cross the reference line, signifying decline country level population.</p>
+                    <p>It is shown by the annotation trace that the median density is start moving towards the second quadrant.</p>
+            <p>However, the median is not significant nor close to crossing the reference line yet, thus the world is still growing in population.</p>
             <p>CURRENT STATUS:</p>
                 <h2><b>WORLD POPULATION GROWTH STARTS TO STAGNATE</b></h2>
                 </span>
@@ -1016,7 +1018,7 @@ if (martiniDone==false){
                         <h3>Gen Z and Gen Alpha</h3>
                         <h4>Movement trending to fourth quadrant</h4>
                         <p> It is shown by the annotation trace that the median density is moving towards the reference line and even more countries crossed the reference line into the third quadrant</p>
-                        <p> This seems to be the trend throughout the world, which if the trend continues, all the countries will ends up in the fourth quadrant</p>
+                        <p> This seems to be the trend throughout the world, which if the trend continues, all the countries will ends up in the fourth quadrant, where the world population will continue to decline.</p>
                         <p>CURRENT STATUS:</p>
                     <h2><b>START OF POPULATION DECLINE</b></h2>
                     </span>
