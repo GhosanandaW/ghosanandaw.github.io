@@ -108,14 +108,11 @@ body {
     }
 
 
-  #yearDropdown{
-    position: relative;
-    left: 0px;
-    margin-left:-30px;
-    top:150px;
-    height:50px;
-    width:100px;
-    border: dashed red;
+  #yearDropDown{
+    display:none
+  }
+  #year{
+    display:none
   }
 
     .rightGutter{
@@ -138,7 +135,7 @@ body {
     }
 
     .falseFooter{
-        margin: 0 auto;
+      /* margin: 0 auto;
         height:300px;
         width:100%;
         display:flex;
@@ -146,10 +143,10 @@ body {
   vertical-align: center;
   align-content: center;
   align-items: center;
-  justify-content: center;
+  justify-content: center; */
     }
 
-    .timelineSliderSVG{
+    .timelineSliderSVGID{
         margin: 0 auto;
         display:flex;
     text-align: center;
@@ -182,7 +179,15 @@ body {
 
     #content3{
         display: none;
-        
+    }
+
+    #content4{
+      display:none;
+    }
+    .offset{
+      position: relative;
+    right: 10px;
+    width: 100px;
     }
 
 </style>
@@ -193,21 +198,26 @@ body {
     
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js"></script>
-<script>   
+<script async>   
 // Parts of the codes are inspired and referred from: https://d3-graph-gallery.com/scatter.html
 // Scales and legend inspired and referred from: https://observablehq.com/@d3/continuous-scales
  var data;
+
  var dataPerYear;
  var region;
  var yearTest=['1950'];//default value of year
-var yearMartini=['1950','1965','1981','1997','2021'] 
+var yearMartini=['1950','1965','1981','2021'] 
 //starting, boomer+GenX, Millenials+GenZ, Gen Alpha and beyond? --> probably continue declining
 //https://www.beresfordresearch.com/age-range-by-generation/
 
 //  var yearMartini=['1950','1975','2000','2021']
 
-const yearDropdown = document.getElementById('yearDropdown');
-
+async function dataQuery() {
+  console.log('data querying')
+  data=await d3.csv('./joined_world_population_data.csv').then(()=>{console.log('async call for data completed')}).then((data)=>{return new Promise((resolve,reject)=>{
+    resolve(data);
+  })})
+ }
 // Function to populate the dropdown with years
 
 
@@ -232,8 +242,8 @@ var globalCircle;
 var densityColorMapdomain=[0,0.003];
 var slideTimeScale;
 var timelineSliderAxis;
-
-
+var timelineSliderSVG;
+var currentPurpleBall;
 var firstLoad=true;
 var timelineSliderGroup;
 var currentYear='1950'
@@ -248,7 +258,7 @@ for (let i = 1950; i < 2022; i++) {
         yearsAll.push(i.toString());
 }
 
-
+var martiniDone=false;
 //global scale
  // Prepare a color palette for density map
 //  var colorDensityMap = d3.scaleLinear()
@@ -261,12 +271,23 @@ for (let i = 1950; i < 2022; i++) {
 
       //console.log(querying data)
 
-
+ regionDistinct=['East Asia & Pacific', 'Europe & Central Asia', 'Latin America & Caribbean', 'Middle East & North Africa', 'North America', 'South Asia', 'Sub-Saharan Africa']
  async function dataRequestandInit(year)
  {
-    console.log('data init running, waiting for data HTTP request')
-    data=await d3.csv('./joined_world_population_data.csv');
-    dataPerYear=d3.group(data,d=>d.Year);
+  console.log('data init running, waiting for data HTTP request')
+    // if (firstLoad==true){
+    //   console.log('query running')
+      
+    //   console.log('query done')
+    // }
+    // console.log('query running')
+    // var dataasyncWait= firstLoad==true?data= await dataQuery().then((tempData)=>{ 
+    //   dataPerYear=d3.group(data,d=>d.Year);}): dataPerYear=d3.group(data,d=>d.Year);
+    data=await d3.csv('./joined_world_population_data.csv')
+    dataPerYear=d3.group(data,d=>d.Year)
+    console.log('query done')
+
+    // dataPerYear=d3.group(data,d=>d.Year);
     console.log('data init running, waiting for data HTTP request')
     console.log (data);
     console.log (dataPerYear);
@@ -296,7 +317,7 @@ for (let i = 1950; i < 2022; i++) {
 //main body
 console.log('entering yearsAll loop')
 console.log (currentYear)
-mainRendering(year);
+await mainRendering(year);
 firstLoad=false;
 // yearList.map( (eachYear)=>{
 //     setTimeout(async () => {
@@ -343,17 +364,28 @@ var type = d3.annotationCalloutCircle
 //main function and other functions
     async function mainRendering(year)
     {
-
-        // const element = document.getElementById("div-02");
-    if (year!='1950'){
+console.log("first load is:",firstLoad)
+    if (firstLoad==false){
+      tempArrayCurrentyear=[];
+      tempArrayCurrentyear.push(parseInt(year))
+//     currentPurpleBall.data(tempArrayCurrentyear).enter().append('circle')
+// .attr('x',(d,i)=>{return slideTimeScale(parseInt(d))})
+// .attr("transform", `translate(${0}, ${-8})`)
+//   .attr('r', 10)
+//   .attr('fill', 'purple')
+//   .attr("style", "dominant-baseline: hanging; text-anchor: middle;  font-weight: 900;").attr("class", "dynamicComponent").attr("id", "purpleBall")
+//   .raise();
+  await d3.selectAll("#purpleBall").remove();
     await d3.selectAll(".dynamicComponent").remove();
+    // await d3.selectAll("#dynamicComponent").remove();
     console.log('current year is', year);
     firstSceneBool==false;
 }
 
-    if (year=='1950' && firstLoad==true){
+    if (firstLoad==true){
     //required init
     //create svg component
+
     console.log ('entering non 1950 loop')
     svg = d3.select("#D3MainContent")
       .append("svg")
@@ -369,12 +401,11 @@ var type = d3.annotationCalloutCircle
           .attr('style','position: relative; z-index: 99;')
           .raise()
 
-          timelineSliderSVG = d3.select(".falseFooter")
+        timelineSliderSVG= d3.select("#falseFooter")
       .append("svg")
       .attr('width', timeSliderWidth)
       .attr('height', 300)
-        .attr("transform", `translate(${-200}, ${0})`)
-
+        .attr("transform", `translate(${0}, ${0})`)
 
 //axis setup
 // var xAxisDomain = [0, d3.max(data,function(d) { return +d['Crude Birth Rate (births per 1,000 population)']; })];
@@ -617,6 +648,47 @@ var colorDensityMapLegendBar= colorDensityMapLegendBarSvg.selectAll("rect")
   .raise();
 
 
+  //create legend for color coding country
+//   function onlyUnique(value, index, array) {
+//   return array.indexOf(value) === index;
+// }
+// console.log ('data per year is', dataPerYear.get(year)
+// let uniqueCountryTemp=[...dataPerYear.get(year)]
+// Object.keys(uniqueCountryTemp).forEach(function(key, index) {
+//   coutries=uniqueCountryTemp['Region']
+// });
+// console.log (coutries)
+// let uniqueCountry=coutries.filter(onlyUnique)
+// console.log(uniqueCountry)
+
+
+
+// Add one dot in the legend for each name.
+console.log('distict regions are:',regionDistinct)
+var size = 20
+svgLegend.selectAll("legendBoxes")
+  .data(regionDistinct)
+  .enter()
+  .append("rect")
+    .attr("x", 100)
+    .attr("y", function(d,i){ return 100 + i*(size+5)}) // 100 is where the first dot appears. 25 is the distance between dots
+    .attr("width", size)
+    .attr("height", size)
+    .style("fill", function(d,i){ return color(d)}).attr("transform", `translate(${-110}, ${25})`)
+
+// Add one dot in the legend for each name.
+svgLegend.selectAll("labelsBox")
+  .data(regionDistinct)
+  .enter()
+  .append("text")
+    .attr("x", 100 + size*1.2)
+    .attr("y", function(d,i){ return 100 + i*(size+5) + (size/2)}) // 100 is where the first dot appears. 25 is the distance between dots
+    .style("fill", function(d){ return color(d)})
+    .text(function(d,i){ return d})
+    .attr("text-anchor", "left").attr("transform", `translate(${-110}, ${30})`)
+    
+
+
 //END OF STATICS COMPONENT, DO NOT DELETE THE CURLY  
     }
 
@@ -672,7 +744,7 @@ svg.append('g')
     // console.log (circle.nodes())
     // console.log (d)
     const circleNodes = svg.selectAll('circle').nodes()
-    console.log (circleNodes)
+    // console.log (circleNodes)
 
 
     // if (circle.size() === 1) { // Check if circle exists
@@ -689,7 +761,7 @@ svg.append('g')
     otherLabels.forEach(otherLabel => {
       if (isOverlapping(label, otherLabel)) {
         // Adjust label position here (e.g., move it down or to the side)
-        console.log ('is overlapping between label and otherLabel', label, otherLabel)
+        // console.log ('is overlapping between label and otherLabel', label, otherLabel)
         label.setAttribute('y', label.getAttribute('y') - 5); // Simple adjustment, you can refine this
         adjusted = true;
       }
@@ -698,7 +770,7 @@ svg.append('g')
     circleNodes.forEach(circleNode => {
       if (isOverlapping(label, circleNode)) {
         // Adjust label position here (e.g., move it down or to the side)
-        console.log ('is overlapping between label and otherLabel', label, circleNode)
+        // console.log ('is overlapping between label and otherLabel', label, circleNode)
         label.setAttribute('y', label.getAttribute('y') - 5); // Simple adjustment, you can refine this
         adjusted = true;
       }
@@ -750,8 +822,8 @@ function isOverlapping(element1, element2) {
 //Create density map
   // compute the density data
   const densityData = d3.contourDensity()
-    .x(function(d) { console.log (d['Crude Death Rate (deaths per 1,000 population)']); return xAxis(d['Crude Death Rate (deaths per 1,000 population)']); })
-    .y(function(d) { console.log(d['Crude Birth Rate (births per 1,000 population)']);return yAxis(d['Crude Birth Rate (births per 1,000 population)']); })
+    .x(function(d) {return xAxis(d['Crude Death Rate (deaths per 1,000 population)']); })
+    .y(function(d) { return yAxis(d['Crude Birth Rate (births per 1,000 population)']); })
     .size([width, height])
     .bandwidth(7)
     (dataPerYear.get(year))
@@ -959,7 +1031,7 @@ const animationPathGenerator = d3.line()
   const annotationTracePath = await svg.append('path')
           .attr('d', animationPathGenerator(globalMedian3Centroid))
           .attr('stroke', 'maroon')
-          .attr('fill', 'none');
+          .attr('fill', 'none').attr("id","animationPath")
 
       // draw circle at initial location
 
@@ -973,7 +1045,7 @@ const animationPathGenerator = d3.line()
           .duration(3000)
           .attrTween('transform', translateAlong(annotationTracePath.node()));
 
-      // https://bl.ocks.org/mbostock/1705868
+      // code referred to from https://bl.ocks.org/mbostock/1705868
       function translateAlong(path) {
         const length = path.getTotalLength();
         return function() {
@@ -984,10 +1056,7 @@ const animationPathGenerator = d3.line()
         }
       }
 
-
-
-
-timelineSliderGroup=timelineSliderSVG.append('g').attr("class", "timelineSliderSVG").attr("transform", `translate(${50}, ${25})`)
+timelineSliderGroup=timelineSliderSVG.append('g').attr("class", "dynamicComponent").attr("transform", `translate(${50}, ${25})`)
 
 timelineSliderGroup.append("g")
 .attr("class", "dynamicComponent")
@@ -995,7 +1064,6 @@ timelineSliderGroup.append("g")
 
 const timelineSliderAnnotationLine = timelineSliderGroup.selectAll().data(yearMartini).enter().append('rect').attr("class", "dynamicComponent")
 .attr('x',(d,i)=>{return (slideTimeScale(d)-1.5)})
-.attr('class', 'timelineSliderAnnotationLine')
     .attr('width', 3)
   .attr('rx', 2)
   .attr('height', 60)
@@ -1009,30 +1077,49 @@ const timelineSliderAnnotationLine = timelineSliderGroup.selectAll().data(yearMa
 timelineSlidertext = timelineSliderGroup.selectAll().data(yearMartini).enter().append('text').attr("class", "dynamicComponent")
 .attr('x',(d,i)=>{return slideTimeScale(d)})
 .attr("transform", `translate(${0}, ${60})`)
-  .attr('class', 'timelineSliderHandle')
   .text((d,i)=>{return d})
   .attr("style", "dominant-baseline: hanging; text-anchor: middle;  font-weight: 900;") // Text alignment and styling
   .attr("font-size", 20)
   .attr('border', 'dashed red')
   .raise();
 
-  recreatePurpleHandler(currentYear);
+
 //Create the circle handle for timeline bar
+let tempArr=[];
+tempArr.push(parseInt(currentYear))
+console.log('this is tempArr: ', tempArr);
+timelineSliderGroup.selectAll('circle').remove()
+timelineSliderGroup.selectAll().data(tempArr).enter().append('circle')
+.attr('cx',(d,i)=>{console.log('purple ball got executed, data is: ',d,i, slideTimeScale(d)); return slideTimeScale(d)})
+.attr("transform", `translate(${0}, ${-8})`)
+  .attr('r', 10)
+  .attr('fill', 'purple')
+  .raise();
 
 
 console.log ('end of mainRendering function')
 //end of mainRendering, don't remove curly
 }
 
+
+
+// timelineSliderSVG.append('g').selectAll('g').append('g').attr("class", "dynamicComponent").attr("transform", `translate(${50}, ${25})`).data(tempArr).enter().append('g').append('circle')
+// .attr('x',(d,i)=>{return slideTimeScale(parseInt(d))})
+// .attr("transform", `translate(${0}, ${-8})`)
+//   .attr('r', 10)
+//   .attr('fill', 'purple')
+//   .attr("style", "dominant-baseline: hanging; text-anchor: middle;  font-weight: 900;") // Text alignment and styling
+//   .raise();
+
 function recreatePurpleHandler (currentYear){
-  timelineSliderGroup.selectAll().data([currentYear]).enter().append('circle').attr("class", "dynamicComponent")
-.attr('x',(d,i)=>{return slideTimeScale(parseInt(d))})
-.attr("transform", `translate(${0}, ${-8})`)
-  .attr('r', 10)
-  .attr('fill', 'purple')
-  .attr("style", "dominant-baseline: hanging; text-anchor: middle;  font-weight: 900;") // Text alignment and styling
-  .raise();
+  let tempArr=[];
+  tempArr.push(parseInt(currentYear))
+  console.log('current year is:', currentYear)
+  console.log('current year is:', tempArr)
+  console.log (timelineSliderSVG)
+
 }
+
 
 
 var currentPageIndex=0;
@@ -1041,7 +1128,7 @@ var pageArrayIndexing=['content0', 'content1','content2','content3']
 
 
 document.addEventListener("DOMContentLoaded", async function() {
-
+  recreatePurpleHandler(currentYear);
 //     function nextButtonAction(currentPageIndex){
 //         //take index to pageArrayIndexing
 //         console.log ('JS listened to eventlistener for nextButtonAction')
@@ -1077,24 +1164,90 @@ document.addEventListener("DOMContentLoaded", async function() {
 
 // nextButtonEventListerner.addEventListener("onclick", nextButtonAction(currentPageIndex));
 // backButtonEventListerner.addEventListener("onclick", previousButtonAction(currentPageIndex));
+  // Add event listener to the submit button
+  window.onload= document.getElementById('submitBtn');
+  submitBtn.addEventListener('click', () => {
+    // d3.selectAll('path').remove();
+    console.log('button click detected, value is: ',yearSelect.value)
+    const selectedYear = yearSelect.value;
+    currentYear=String(selectedYear);
+mainRendering(currentYear)
+    console.log('Selected year:', selectedYear);
+    // Do something with the selected year here
+  });
 
-document.getElementById("nextButton").addEventListener("click", async ()=>{
+
+window.onload= document.getElementById("nextButton").addEventListener("click", async ()=>{
+  var dropdownComponent=[];
+  
+
+  //  document.getElementByClassName("content3").map((classValue)=>{dropdownComponent.append(classValue)})
+
+  //     if (currentPageIndex==pageArrayIndexing.length-1){
+  //       // dropdownComponent.map((eachComponent)=>{eachComponent.style='block';})
+  //       dropdownComponent.style='block'
+  //     }
+if (martiniDone==false){
     console.log ('JS listened to eventlistener for nextButtonAction')
-        if ((currentPageIndex<=pageArrayIndexing.length-1) && (currentPageIndex>=0) && ((currentPageIndex+1)!=pageArrayIndexing.length)){
+    console.log (currentYear,currentPageIndex)
+        if ((currentPageIndex<=pageArrayIndexing.length-1) && (currentPageIndex>=0)){
         const elementToHide = document.getElementById(pageArrayIndexing[currentPageIndex]);
         const elementToShow= document.getElementById(pageArrayIndexing[currentPageIndex+1]);
-        currentYear=String(yearMartini[currentPageIndex+1])
+        if (currentPageIndex==pageArrayIndexing.length-1){
+          console.log ('end of martini detected',currentPageIndex,pageArrayIndexing.length-1)
+
+
+          //last run before pass down
+          document.getElementById('yearDropDown').style.display='block';
+         elementToHide.style.display="none"
+         document.getElementById('content4').style.display='inline';
+        document.getElementById('nextButton').style.display='none';
+        document.getElementById('year').style.display='inline';
+
+
+       currentPageIndex=parseInt(currentPageIndex)+1;
+       martiniDone=true;
+       
+        console.log ('current year and counter is')
+        console.log (currentYear,currentPageIndex,pageArrayIndexing)
+        }
+      //     currentYear=String(yearMartini[currentPageIndex+1])
+      //  const placeholder= await dataRequestandInit(yearMartini[currentPageIndex+1]).then(()=>       
+      //  {
+      //   document.getElementById('yearDropDown').style.display='block';
+      //    elementToHide.style.display="none"
+      //    elementToShow.style.display='inline';
+      //   document.getElementById('nextButton').style.display='none';
+      //   document.getElementById('year').style.display='inline';
+
+
+      //  currentPageIndex=parseInt(currentPageIndex)+1;
+      //  martiniDone=true;
+       
+      //   console.log ('current year and counter is')
+      //   console.log (currentYear,currentPageIndex,pageArrayIndexing)
+      //   }
+      //   )
+        else {
+          document.getElementById('content4').style.display='none';
+          document.getElementById('year').style.display='none';
+          currentYear=String(yearMartini[currentPageIndex+1])
        const placeholder= await dataRequestandInit(yearMartini[currentPageIndex+1]).then(()=>       
        {
         elementToShow.style.display='inline';
-       currentPageIndex=currentPageIndex+1;
+       currentPageIndex=parseInt(currentPageIndex)+1;
         elementToHide.style.display="none"
-        console.log ('current year is')
-        console.log (currentYear,currentPageIndex)
+        console.log ('current year and counter is')
+        console.log (currentYear,currentPageIndex,pageArrayIndexing)
         }
         )
+        }
+        
+        
+}
 }
 })
+
 
 // document.getElementById("backButton").addEventListener("click", async ()=>{
 //     console.log ('JS listened to eventlistener for previous ButtonAction')
@@ -1111,30 +1264,30 @@ document.getElementById("nextButton").addEventListener("click", async ()=>{
 //     })
 // }
 // })
-const yearDropDown = document.getElementById('year').value;
-        const submitBtn = document.getElementById('submitBtn');
+// const yearDropDown = document.getElementById('year').value;
+        
 
-        submitBtn.addEventListener('click', () => {
-            currentYear = yearDropdown.value;
-            console.log('Selected year:', selectedYear);
-            dataRequestandInit(String(currentYear))
-            // You can do something with the selected year here
-        });
-
+// const submitBtn = document.getElementById('submitBtn').addEventListener('click', () => {
+//             currentYear = yearDropdown.value;
+//             console.log('Selected year:', selectedYear);
+//             mainRendering(String(currentYear))
+//         });
 
 
-function populateYears(startYear, endYear) {
-  for (let year = endYear; year >= startYear; year--) {
-    const option = document.createElement('option');
-    option.value = year;
-    option.text = year;
-    yearDropdown.appendChild(option);
-  }
-  console.log('populate year Running')
-}
 
-// Call the function to populate the dropdown
-populateYears(1950, 2021);
+// function populateYears(startYear, endYear) {
+//   for (let year = endYear; year >= startYear; year--) {
+//     const option = document.createElement('option');
+//     option.value = year;
+//     option.text = year;
+//     yearDropdown.appendChild(option);
+//   }
+//   console.log('populate year Running')
+// }
+
+
+// // Call the function to populate the dropdown
+// populateYears(1950, 2021);
 })
 
 </script>
@@ -1154,28 +1307,40 @@ populateYears(1950, 2021);
 
     </div>
     </div>
-    <div id="D3MainContent" class="fixed" ></div>
+    <div id="D3MainContent" class="fixed" >
+    </div>
     <div id="D3Misc" class="rightGutter box">
-      <span class="content3">
-      <form>
-        <label for="year">Choose a year:</label>
-        <select name="year" id="year">
-            <script>
-                for (let year = 2021; year >= 1950; year--) {
-                    document.write('<option value="' + year + '">' + year + '</option>');
-                }
-            </script>
-        </select>
-        <br><br>
-        <input type="submit" value="Submit">
-    </form>
-  </span>
-        <button id='nextButton'type="button">Following Generation</button>
+      <div id="yearDropDown" class="offset" style="border:dash red;">
+        <span class="offset" >
+        <form class="offset" style="border:dash red;">
+          <label for="year" class="offset">Choose a year:</label>
+          <select name="year" id="year" class="offset" value=year>
+              <script>
+                  // for (let year = 2021; year >= 1950; year--) {
+                  //     document.write('<option value="' + year + '">' + year + '</option>');
+                  // }
+
+                  // Populate the select options
+  const yearSelect = document.getElementById('year');
+  for (let year = 2021; year >= 1950; year--) {
+    const option = document.createElement('option');
+    option.value = year;
+    option.text = year;
+    yearSelect.appendChild(option);
+  }
+              </script>
+          </select>
+          <br><br>
+          <button type="button"id='submitBtn' class="offset" click="" style="height:20px;">Select a year</button>
+      </form>
+    </span>
+    </div>
+        <button id='nextButton'type="button" class="offset" click="">Following Generation</button>
     </div>
     <div id="rightNarrative" class="rightNarrative">
         <span id="content0" class='content'>
-        <h2><b><u>Beginning of data: 1951</u></b></h>
-            <h3>Baby Boomers and Gen X Generation</h3>
+        <h2><b><u>Beginning of data: 1950</u></b></h>
+            <h3>Baby Boomers Generation</h3>
             <h4>Introduction to the data and visualization</h4>
             <p>The scatterplot visualize and hoped to help everyone on understanding the history, the present, and the future prediction of our world population-where it signifies population growth and decline of nations worldwide!</p>
             <p>The data was referred to from the UN database and the visualization provides the insights on various countries population size, birth rate, and death rate, by exposing the data with metrics, shown below:</p>
@@ -1189,40 +1354,50 @@ populateYears(1950, 2021);
             <li><b>Annotation:</b> Densest, median, and least dense area in a certain zone.</li>
         </ul>
         <p>In 1950, the median and highest density in the graph is on the right top (first) quadrant of the chart, which signifies that majority of the countries are in birth rate and high death rate zone.</p>
-        <p> In other words, the world is having:</p>
+        <p> CURRENT STATUS:</p>
         <h2><b>POPULATION GROWTH</b></h2>
         </span>
 
         <span id="content1" class='content'>
-            <h2><b><u>Midpoint to today: 1965</u></b></h>
+            <h2><b><u>Start of shift: 1965</u></b></h>
                 <h3>Gen X</h3>
-                <h4>Movement trending to second quadrant</h4>
-                <p> It is shown by the annotation trace that the median density is moving towards the second quadrant</p>
-            <p> However, it is not crossing the reference line yet, thus the world is still growing in population. In other words, the world is having:</p>
-            <h2><b>Population growth (still)-BUT AT SLOWER SPACE</b></h2>
+                <h4>Movement started-trending from second to third quadrant</h4>
+                <p> Although not apparant, this signify the start of trend shift, where the world population starts seeing lower death and still high birth</p>
+                <p> The median density started to show movemenet towards the second quadrant, but the world population is still increasing, even with high birth and high death rate</p>
+            <p>CURRENT STATUS:</p>
+            <h2><b>WORLD POPULATION GROWS, BUT START TO SEE SHIFT IN TREND</b></h2>
             </span>
 
             <span id="content2" class='content'>
                 <h2><b><u>Midpoint to today: 1980</u></b></h>
                     <h3>Millenials</h3>
                     <h4>Movement trending to third quadrant</h4>
-                    <p> It is shown by the annotation trace that the median density is moving towards the second quadrant</p>
-            <p> However, it is not crossing the reference line yet, thus the world is still growing in population.</p>
-                
-                <p> In other words, the world is having:</p>
-                <h2><b>Population growth (still), but more countries are heading towards DECLINING POPULATION</b></h2>
+                <p> It is becoming more apparant by the annotation trace that the higher density area had shifted towards the second quadrant, the lower left side of the map</p>
+                    <p> It is shown by the annotation trace that the median density is start moving towards the second quadrant</p>
+            <p> However, it is not significant nor close to crossing the reference line yet, thus the world is still growing in population.</p>
+            <p>CURRENT STATUS:</p>
+                <h2><b>WORLD POPULATION GROWTH STARTS TO STAGNATE</b></h2>
                 </span>
 
 
                 <span id="content3" class='content'>
-                    <h2><b><u>The world today: 2021~</u></b></h>
-                        <h3>Gen Alpha</h3>
+                    <h2><b><u>The world today: 2021~What's next?</u></b></h>
+                        <h3>Gen Z and Gen Alpha</h3>
                         <h4>Movement trending to fourth quadrant</h4>
                         <p> It is shown by the annotation trace that the median density is moving towards the reference line and even more countries crossed the reference line into the third quadrant</p>
-                        <p> This seems to be the trend throughout the world</p>
-                    <p> In other words, the world is having:</p>
+                        <p> This seems to be the trend throughout the world, which if the trend continues, all the countries will ends up in the fourth quadrant</p>
+                        <p>CURRENT STATUS:</p>
                     <h2><b>START OF POPULATION DECLINE</b></h2>
                     </span>
+
+                    
+                <span id="content4" class='content'>
+                  <h2><b><u>EXPLORE THE DATA FREELY</u></b></h>
+                      <h3>Pick a year from a drop down, and it will show what are the population growth and densities in much granularity with the years </h3>
+                      <h4>The data will adapt, process, and render your data</h4>
+                      <p>What will happen next? Nobody knows for sure since this phenomena of population decline is a topic that was not common throughout history.</p>
+                  <h2><b>STAY CURIOUS</b></h2>
+                  </span>
 
     </div>
     <div class='rightMargin'></div>
