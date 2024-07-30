@@ -246,7 +246,8 @@ var timelineSliderSVG;
 var currentPurpleBall;
 var firstLoad=true;
 var timelineSliderGroup;
-var currentYear='1950'
+var currentYear='1950';
+var regionDistinctFromGetMap;
 // var currentYear = String(getElementById('year').value);
 if (currentYear==null || currentYear==undefined) {
   currentYear='1950'
@@ -538,11 +539,30 @@ var colorDensityMapLegendBar= colorDensityMapLegendBarSvg.selectAll("rect")
   .text("Density of country number")
   .raise();
 
+//D3 iterator for color sync
+svg.append('g')
+    .selectAll("circle")
+    .data(dataPerYear.get(year))
+    .enter()
+    .append("circle")
+    .attr("class", "dynamicComponent")
+    .attr('cx',(d,i)=>{return xAxis(d['Crude Death Rate (deaths per 1,000 population)'])})
+    .attr('cy',(d,i)=>{return yAxis(d['Crude Birth Rate (births per 1,000 population)'])})
+    .attr('r',(d,i)=>{return circleRadiusScale(d['Total Population, as of 1 July (thousands)'])})
+    .attr("stroke", "steelblue")
+      .attr("stroke-width", 1.5)
+      .attr("fill", (d,i)=>{return color(d['Region'])})
+
+
+var tempColorArray= dataPerYear.get(year)
+var tempOverallRegionArray=[];
+tempColorArray.map((d,i)=>{tempOverallRegionArray=[...tempOverallRegionArray,d['Region']];})
+regionDistinctFromGetMap= Array.from(new Set(tempOverallRegionArray))
 
 // Add one dot in the legend for each name.
 var size = 20
 svgLegend.selectAll("legendBoxes")
-  .data(regionDistinct)
+  .data(regionDistinctFromGetMap)
   .enter()
   .append("rect")
     .attr("x", 100)
@@ -553,7 +573,7 @@ svgLegend.selectAll("legendBoxes")
 
 // Add one dot in the legend for each name.
 svgLegend.selectAll("labelsBox")
-  .data(regionDistinct)
+  .data(regionDistinctFromGetMap)
   .enter()
   .append("text")
     .attr("x", 100 + size*1.2)
@@ -588,8 +608,8 @@ svg.append('g')
     .attr('cx',(d,i)=>{return xAxis(d['Crude Death Rate (deaths per 1,000 population)'])})
     .attr('cy',(d,i)=>{return yAxis(d['Crude Birth Rate (births per 1,000 population)'])})
     .attr('r',(d,i)=>{return circleRadiusScale(d['Total Population, as of 1 July (thousands)'])})
-    .attr("stroke", "steelblue")
-      .attr("stroke-width", 1.5)
+    .attr("stroke", "black")
+      .attr("stroke-width", 0.5)
       .attr("fill", (d,i)=>{return color(d['Region'])})
 
 //Create label for the data points
